@@ -419,6 +419,19 @@ public class EmphasisInlineParser : InlineParser, IPostInlineProcessor
                         break;
                     }
                 }
+
+                // Leftover delimiter characters keep the following inlines nested inside
+                // the emphasis; move them out so they keep their original position.
+                if (closeDelimiter.DelimiterCount > 0 && closeDelimiter.Parent is EmphasisInline closerParentEmphasis)
+                {
+                    var outermostEmphasis = closerParentEmphasis;
+                    while (outermostEmphasis.Parent is EmphasisInline ancestorEmphasis)
+                    {
+                        outermostEmphasis = ancestorEmphasis;
+                    }
+
+                    closeDelimiter.MoveChildrenAfter(outermostEmphasis);
+                }
             }
         }
 
