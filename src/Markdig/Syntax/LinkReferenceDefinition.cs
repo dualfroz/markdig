@@ -137,6 +137,16 @@ public class LinkReferenceDefinition : LeafBlock
     public CreateLinkInlineDelegate? CreateLinkInline { get; set; }
 
     /// <summary>
+    /// Gets whether this definition may resolve into a link while its label is
+    /// nested inside another still-open link or image bracket.
+    /// </summary>
+    /// <remarks>
+    /// <c>true</c> for user-authored definitions, preserving CommonMark's "links
+    /// cannot contain links". Implicitly generated ones override it to <c>false</c>.
+    /// </remarks>
+    internal virtual bool AllowResolutionInsideOpenLink => true;
+
+    /// <summary>
     /// Tries to the parse the specified text into a definition.
     /// </summary>
     /// <typeparam name="T">Type of the text</typeparam>

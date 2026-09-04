@@ -21,4 +21,28 @@ public class TestAutoLinks
 
         Assert.That(html, Is.EqualTo(expected).IgnoreWhiteSpace);
     }
+
+    // https://github.com/xoofx/markdig/issues/668
+    // A heading's implicit reference must not resolve inside another still-open
+    // link bracket, which would break the outer link.
+    [Test]
+    public void TestAutoIdentifierHeadingLinkDoesNotHijackNestedLinkLabel()
+    {
+        var markdown = "# Testing Markdown\n\n" +
+                        "### Header\n\n" +
+                        "[Testing [Header]](https://www.bing.com)\n\n" +
+                        "[Testing [test]](https://www.google.com)\n";
+        var expected = "<h1 id=\"testing-markdown\">Testing Markdown</h1>\n" +
+                        "<h3 id=\"header\">Header</h3>\n" +
+                        "<p><a href=\"https://www.bing.com\">Testing [Header]</a></p>\n" +
+                        "<p><a href=\"https://www.google.com\">Testing [test]</a></p>";
+
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAutoLinks()
+            .UseAutoIdentifiers()
+            .Build();
+        var html = Markdown.ToHtml(markdown, pipeline);
+
+        Assert.That(html, Is.EqualTo(expected).IgnoreWhiteSpace);
+    }
 }
